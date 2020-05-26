@@ -23,7 +23,7 @@ type PemFiles struct {
 
 // Default values
 const (
-	defaultHost  = "kafka-0.stage.ocdp-nonprod.optum.com:443"
+	defaultHost  = "yourhostname:443"
 	defaultTopic = "test"
 
 	defaultClientCert = "client.cer.pem"

@@ -5,7 +5,7 @@ keytool -keystore kafka.truststore.jks -alias CARoot -import -file ca-cert
 keytool -keystore kafka.truststore.jks -alias CARoot -import -file ca-cert
 
 keytool -keystore kafka.keystore.jks -alias localhost -certreq -file cert-file
-openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass:changeit
+openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass: password
 keytool -keystore kafka.keystore.jks -alias CARoot -import -file ca-cert
 keytool -keystore kafka.keystore.jks -alias localhost -import -file cert-signed
 

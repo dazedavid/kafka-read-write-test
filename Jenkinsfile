@@ -15,11 +15,9 @@ pipeline {
        }
        stage('run the test') {
            steps {
-               scripts {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
                    sh "go run kafkaconsumerandproducer.go"
-               }
            }
        }
    }

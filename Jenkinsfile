@@ -21,7 +21,7 @@ pipeline {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
                    sh "go run kafkaconsumerandproducer.go > test.html"
-              publishHTML target: [
+              publishHTML (target: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,
             keepAll: true,
@@ -29,7 +29,7 @@ pipeline {
             reportFiles: 'test.html',
             reportName: 'Kafka Report'
             reportTitles: 'The Report'
-          ]
+          ])
       }
     }
   }

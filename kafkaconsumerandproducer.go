@@ -143,7 +143,7 @@ ProducerLoop:
 		select {
 		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(10)}:
 			log.Printf("Produced message %d\n", enqueued)
-			fmt.Println(("Produced message %d\n", enqueued)
+			fmt.Println("Produced message %d\n", enqueued)
 			enqueued++
 			var wg sync.WaitGroup
 			for partition := range partitions {

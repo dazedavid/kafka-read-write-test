@@ -28,7 +28,6 @@ pipeline {
                  reportDir: './',
             reportFiles: 'test.html',
             reportName: 'Kafka Report'
-            reportTitles: 'The Report'
           ])
       }
     }

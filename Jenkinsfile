@@ -20,7 +20,7 @@ pipeline {
            steps {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
-                   sh "go run kafkaconsumerandproducer.go > test.out"
+                   sh "go run kafkaconsumerandproducer.go > test.html"
               publishHTML target: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,

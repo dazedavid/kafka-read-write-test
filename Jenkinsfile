@@ -1,8 +1,8 @@
 pipeline {
    agent any
-   triggers {
-        cron('H/2 * * * *')
-    }
+  //triggers {
+    //    cron('H/2 * * * *')
+   // }
    stages {
        stage('Prepare Environment') {
            steps {

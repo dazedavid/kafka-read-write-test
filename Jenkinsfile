@@ -21,6 +21,7 @@ pipeline {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
                    sh "go run kafkaconsumerandproducer.go > test.out"
+                   sh 'bundle exec rake spec'
               publishHTML target: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,

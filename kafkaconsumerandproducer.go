@@ -143,6 +143,7 @@ ProducerLoop:
 		select {
 		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(10)}:
 			log.Printf("Produced message %d\n", enqueued)
+			fmt.Println(("Produced message %d\n", enqueued)
 			enqueued++
 			var wg sync.WaitGroup
 			for partition := range partitions {
@@ -220,6 +221,7 @@ ConsumerLoop:
 		select {
 		case msg := <-partitionConsumer.Messages():
 			log.Printf("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
+			fmt.Println("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
 			consumed++
 			// if consumed >= 10 {
 			//	break ConsumerLoop

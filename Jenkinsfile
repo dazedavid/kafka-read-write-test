@@ -20,13 +20,13 @@ pipeline {
            steps {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
-                   sh "go run kafkaconsumerandproducer.go > test.xml"
+                   sh "go run kafkaconsumerandproducer.go > test.html"
               publishHTML target: [
             allowMissing: false,
             alwaysLinkToLastBuild: false,
             keepAll: true,
                  reportDir: './',
-            reportFiles: 'test.xml',
+            reportFiles: 'test.html',
             reportName: 'RCov Report'
           ]
       }

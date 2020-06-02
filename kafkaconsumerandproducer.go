@@ -178,7 +178,7 @@ ProducerLoop:
 		}
 
 		select {
-		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(1200)}:
+		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(1500)}:
 
 			log.Printf("Produced message %d\n", enqueued)
 			enqueued++

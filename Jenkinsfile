@@ -27,7 +27,7 @@ pipeline {
                            keepAll: true,
                            reportDir: './',
                            reportFiles: 'test.txt',
-                           reportName: 'Kubernetes Report'
+                           reportName: 'Kafka Report'
                          ])
       }
     }

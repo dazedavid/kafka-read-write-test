@@ -21,7 +21,14 @@ pipeline {
                    sh "go get -u -d github.com/Shopify/sarama"
                    sh "go get -u -d github.com/olekukonko/tablewriter"
                    sh "go run kafkaconsumerandproducer.go > test.txt"
-              publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, escapeUnderscores: false, keepAll: false, reportDir: '', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+            publishHTML (target: [
+                           allowMissing: false,
+                           alwaysLinkToLastBuild: false,
+                           keepAll: true,
+                           reportDir: './',
+                           reportFiles: 'test.txt',
+                           reportName: 'Kubernetes Report'
+                         ])
       }
     }
   }

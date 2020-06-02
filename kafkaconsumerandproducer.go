@@ -220,7 +220,6 @@ ConsumerLoop:
 		select {
 		case msg := <-partitionConsumer.Messages():
 			log.Printf("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
-			fmt.Println("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
 			consumed++
 			// if consumed >= 10 {
 			//	break ConsumerLoop

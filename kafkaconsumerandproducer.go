@@ -69,6 +69,41 @@ func main() {
 	}
 	defer consumer.Close()
 
+	tlsConfig, err := NewTLSConfig(pemFiles)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// This can be used on test server if domain does not match cert:
+	// tlsConfig.InsecureSkipVerify = true
+
+	consumerConfig := sarama.NewConfig()
+	consumerConfig.Net.TLS.Enable = true
+	consumerConfig.Net.TLS.Config = tlsConfig
+
+	client, err := sarama.NewClient([]string{host}, consumerConfig)
+	topics, _ := client.Topics() // Listing all the topics
+	fmt.Println("==============================================================")
+	fmt.Println("======================Listing Topics here=====================")
+	fmt.Println("==============================================================")
+	time.Sleep(1 * time.Second)
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name"})
+	counter := 0
+	newdata := []string{}
+	for index := range topics {
+		data := topics[index]
+		newdata = []string{data}
+		table.Append(newdata)
+		counter++
+	}
+	table.Render()
+	fmt.Println("==============================================================")
+	fmt.Println("=========================List ENDS============================")
+	fmt.Println("==============================================================")
+
+	fmt.Println("Total Topics count =", counter)
+	time.Sleep(1 * time.Second)
+	
 	producerconsumerLoop(producer, consumer, topic)
 
 }

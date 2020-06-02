@@ -13,6 +13,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/olekukonko/tablewriter"
+
 	"github.com/Shopify/sarama"
 )
 
@@ -24,8 +26,8 @@ type PemFiles struct {
 
 // Default values
 const (
-	defaultHost  = "kafka-0.stage.ocdp-nonprod.optum.com:443"
-	defaultTopic = "test"
+	defaultHost  = "kafka-0.dev.ocdp-nonprod.optum.com:443" //host address
+	defaultTopic = "test"                                   // topic name for testing or checking input and output
 
 	defaultClientCert = "client.cer.pem"
 	defaultClientKey  = "client.key.pem"
@@ -103,9 +105,8 @@ func main() {
 
 	fmt.Println("Total Topics count =", counter)
 	time.Sleep(1 * time.Second)
-	
-	producerconsumerLoop(producer, consumer, topic)
 
+	producerconsumerLoop(producer, consumer, topic)
 }
 
 //------------------------------------
@@ -152,10 +153,11 @@ func producerSetup(host string, p PemFiles) (sarama.AsyncProducer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to create kafka client: %q", err)
 	}
-
 	return sarama.NewAsyncProducerFromClient(client)
 }
 
+//=============================================================================
+// Producer and Consumer Loop calling different functions
 func producerconsumerLoop(producer sarama.AsyncProducer, consumer sarama.Consumer, topic string) {
 	// Trap SIGINT to trigger a shutdown.
 	signals := make(chan os.Signal, 1)
@@ -176,7 +178,8 @@ ProducerLoop:
 		}
 
 		select {
-		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(10)}:
+		case producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: getRandomValue(1200)}:
+
 			log.Printf("Produced message %d\n", enqueued)
 			enqueued++
 			var wg sync.WaitGroup
@@ -184,10 +187,12 @@ ProducerLoop:
 				wg.Add(1)
 				go func() {
 					consumePartition(consumer, topic, int32(partition), signals)
+					time.Sleep(600 * time.Millisecond) //added producers wait
 					wg.Done()
 				}()
 			}
 			wg.Wait()
+
 			if enqueued >= 10 { // added this to limit it to 10 enteries
 				goto LOOPEND
 			}
@@ -198,13 +203,13 @@ ProducerLoop:
 	}
 	log.Printf("Enqueued: %d; errors: %d\n", enqueued, errors)
 LOOPEND: // defined loop end might not work
-	fmt.Println("The total messages recieved is :", enqueued)
+	fmt.Println("The total messages consumed :", enqueued)
 }
 
 //=============================================================================
 // Produce random string
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letters = []rune("abcdefghijklmnopqrstuv wxyzABCDEFGH IJKL MNOPQRSTUVWXYZ 1234567890")
 
 func getRandomValue(n int) sarama.StringEncoder {
 	b := make([]rune, n)
@@ -215,6 +220,8 @@ func getRandomValue(n int) sarama.StringEncoder {
 	return sarama.StringEncoder(b)
 }
 
+//=============================================================================
+//Consumer Behavior
 func consumerSetup(host string, p PemFiles) (sarama.Consumer, error) {
 	tlsConfig, err := NewTLSConfig(p)
 	if err != nil {
@@ -228,17 +235,21 @@ func consumerSetup(host string, p PemFiles) (sarama.Consumer, error) {
 	consumerConfig.Net.TLS.Config = tlsConfig
 
 	client, err := sarama.NewClient([]string{host}, consumerConfig)
+
 	if err != nil {
 		return nil, fmt.Errorf("unable to create kafka client: %q", err)
 	}
 
 	return sarama.NewConsumerFromClient(client)
+
 }
 
+//=============================================================================
+//Consumer partition and Consumer Loop
 func consumePartition(consumer sarama.Consumer, topic string, partition int32, signals chan os.Signal) {
 	log.Println("Receving on partition", partition)
-
 	partitionConsumer, err := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
+
 	if err != nil {
 		log.Println(err)
 		return
@@ -248,20 +259,22 @@ func consumePartition(consumer sarama.Consumer, topic string, partition int32, s
 			log.Println(err)
 		}
 	}()
-
 	consumed := 0
+	time.Sleep(700 * time.Millisecond) // added sleep to for connection timeout
 ConsumerLoop:
 	for {
 		select {
 		case msg := <-partitionConsumer.Messages():
 			log.Printf("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
+			fmt.Printf("Consumed message offset %d\nData: %s\n", msg.Offset, msg.Value)
 			consumed++
-			// if consumed >= 10 {
-			//	break ConsumerLoop
-			//}
-		case <-time.After(1000 * time.Millisecond):
+			if consumed > 1 {
+				break ConsumerLoop
+			}
+		case <-time.After(120 * time.Millisecond):
 			break ConsumerLoop
 		}
 	}
 	log.Printf("Consumed: %d\n", consumed)
 }
+
